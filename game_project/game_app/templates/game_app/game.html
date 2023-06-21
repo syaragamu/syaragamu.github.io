@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Guessing Game</title>
+</head>
+<body>
+    <h1>数当てゲーム</h1>
+
+    <p>{{ message }}</p>
+    
+    <form action="{% url 'game_app:play' %}" method="POST">
+        {% csrf_token %}
+        <input type="number" name="guess" required>
+        <button type="submit">予想する</button>
+    </form>
+</body>
+</html>
+
+
+
+
+
+

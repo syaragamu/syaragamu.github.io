@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Baseball Game</title>
+</head>
+<body>
+    <h1>Baseball Game</h1>
+
+    {% if game_status == 'clear' %}
+        <h2>Congratulations! You scored 2 or more points. Game Clear!</h2>
+    {% else %}
+        <h2>Round {{ count }}</h2>
+        <p>Out: {{ outs }}</p>
+        <p>Strike: {{ strikes }}</p>
+        <p>Runners: {{ runners }}</p>
+        <p>Point: {{ point }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <p>Choose a pitch: </p>
+            <select name="pitch">
+                <option value="1">ストレート</option>
+                <option value="2">スライダー</option>
+                <option value="3">カーブ</option>
+                <option value="4">フォーク</option>
+                <option value="5">チェンジアップ</option>
+            </select>
+            <br><br>
+            <input type="submit" value="Swing">
+        </form>
+
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+
+        {% if pitch %}
+            <p>You swung {{ pitch }}.</p>
+            <p>The opponent threw {{ c_ball_name }}.</p>
+            {% if point_added %}
+                <p>Point added! You scored!</p>
+            {% else %}
+                <p>Swing and a miss!</p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+</body>
+</html>
+
