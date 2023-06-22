@@ -10,17 +10,24 @@ class BaseballGameView(View):
         request.session['outs'] = 0
         request.session['runners'] = []
         request.session['point'] = 0
+        request.session['count'] = 0
         return render(request, self.template_name)
-
+    
+    def reset(self, request):
+        request.session['strikes'] = 0
+        request.session['outs'] = 0
+        request.session['runners'] = []
+        request.session['point'] = 0
+        request.session['count'] = 0
+    
     def post(self, request):
         pitch = int(request.POST.get('pitch',1))
         strikes = request.session.get('strikes', 0)
         outs = request.session.get('outs', 0)
         runners = request.session.get('runners', [])
         point = request.session.get('point', 0)
-
+        count = request.session.get('count', 1)
         ball_list = ["none", "ストレート", "スライダー", "カーブ", "フォーク", "チェンジアップ"]
-
         def runner_on_first():
             runners.append(1)
 
@@ -169,6 +176,7 @@ class BaseballGameView(View):
             request.session['outs'] = 0
             request.session['runners'] = []
             request.session['point'] = 0
+            
 
         chance = False
 
@@ -179,6 +187,7 @@ class BaseballGameView(View):
 
         c_ball = decide_ball()
         c_ball_name = ball_list[c_ball]
+        p_ball_name = ball_list[p_ball]
 
         if c_ball - p_ball == 0:
             runner_move_and_point_get(p_ball, chance)
@@ -194,20 +203,25 @@ class BaseballGameView(View):
             outs += 1
             strikes = 0
 
-        if point >= 2:
+        if point >= 10:
             print("得点が入った！ゲームクリア！\n\n")
             reset_game()
             return render(request, self.template_name, {'game_status': 'clear', 'point': point})
 
         if outs == 3:
             print("3アウト!この回の攻撃は終了です\n\n\n")
-            reset_game()
-            return render(request, self.template_name, {'game_status': 'out'})
+            strikes = 0
+            runners = []
+            outs = 0
+            count = count + 1
 
         request.session['strikes'] = strikes
         request.session['outs'] = outs
         request.session['runners'] = runners
         request.session['point'] = point
+        request.session['count'] = count
 
         return render(request, self.template_name, {'strikes': strikes, 'outs': outs, 'runners': runners, 'point': point,
-                                                    'c_ball_name': c_ball_name})
+                                                    'c_ball_name': c_ball_name,"count" : count,"p_ball_name" :p_ball_name})
+
+    
