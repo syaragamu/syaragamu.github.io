@@ -2,14 +2,24 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Baseball Game</title>
+    <title>Airthball Game</title>
 </head>
 <body>
     <h1>Airthball Game</h1>
         <p>お試し版。期末後修正予定。(やらんかも)<br>Airthballとルールは一緒だが、特能とかはまだ。</p>
         <p>最初は何も表示されないが、何かのボールを振ると始まる。<br>10点とったらクリア。</p>
+        <p>チェンジアップ玉をカーブで空振りしたら、ゴロでアウト。なお、１塁にランナーがいた場合、ゲッツーとなる。</p>
+        <p>カーブ玉をチェンジアップで空振りしたら、フライでアウト。もし、３塁にランナーがいると、犠牲フライが成立し、得点が入る。</p>
+        <p>特能は、チャンス○か粘り打ちどちらか選択できる。<br>・チャンス○：ランナーが2人以上塁に出ていると、スライダーが2塁に、チェンジアップが3塁になる。</p>
+        <p>・粘り打ち：2ストライクのとき、空振りをしても、右隣にボールが投げられていたらファールとなり、アウトにならない。</p>
     {% if game_status == 'clear' %}
-        <h2>Congratulations! You scored 5 or more points. Game Clear!</h2>
+        <h2>10点おめでとう！！<a href="https://www.youtube.com/watch?v=JQ5uQpVBJTM">ジャマイカ国歌</a></h2>
+    {%elif supercount == None %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="chance" value="1">チャンス○</button>
+            <button type="submit" name="nebari" value="1">粘り打ち</button>
+        </form>
     {% else %}
         <h2>現在{{ count }}回</h2>
         <p>{{ outs }}アウト</p>
@@ -19,12 +29,12 @@
 
         <form method="post">
             {% csrf_token %}
-            <p>Choose a pitch: </p>
-            <button type="submit" name="pitch" value="1">ストレート(25％、1塁打)</button>
-            <button type="submit" name="pitch" value="2">スライダー(25％、1塁打)</button>
+            <p>どの球を振る？</p>
+            <button type="submit" name="pitch" value="1">ストレート(24％、1塁打)</button>
+            <button type="submit" name="pitch" value="2">スライダー(24％、1塁打)</button>
             <button type="submit" name="pitch" value="3">カーブ(10％、本塁打)</button>
-            <button type="submit" name="pitch" value="4">フォーク(25％、1塁打)</button>
-            <button type="submit" name="pitch" value="5">チェンジアップ(15％、２塁打)</button>
+            <button type="submit" name="pitch" value="4">フォーク(24％、1塁打)</button>
+            <button type="submit" name="pitch" value="5">チェンジアップ(18％、２塁打)</button>
         </form>
 
         {% if error %}
@@ -34,19 +44,24 @@
         {% if p_ball_name %}
             <p>君は{{ p_ball_name }}を振ったよ。</p>
             <p>相手は{{ c_ball_name }}を投げたよ。</p>
-            {% if p_ball_name == "カーブ" and c_ball_name == "カーブ"%}
+            {% if p_ball_name == "カーブ" and c_ball_name == "チェンジアップ" %}
+                <p>ゴロ。アウト。ゲッツーになったかはコード作んのめんどいから実際に確かめてくれ。</p>
+            {% elif c_ball_name == "カーブ" and p_ball_name == "チェンジアップ" %}
+                <p>フライ。アウト。犠牲フライが成立したかはコード作んのめんどいから実際に確かめてくれ。</p>
+            {% elif p_ball_name == "カーブ" and c_ball_name == "カーブ"%}
                 <p>ホーーームラン！ｷﾓﾁｪｪﾅｧ。わっか。</p>
             {% elif p_ball_name == "チェンジアップ" and c_ball_name == "チェンジアップ" %}
-                <p>2塁打！君はティーダ！</p>
+                <p>2塁打。君はティーダ！(ランナーが2人以上出てて特能がチャンス○なら3塁打！)</p>
             {% elif p_ball_name == c_ball_name %}
-                <p>ヒットやなぁ。</p>
+                <p>ヒットやなぁ。(ボールがスライダー・ランナー2人以上・特能チャンス○で2塁打！)</p>
             {% elif outs == 0 and strikes == 0 %}
-                <p>チェンジやなぁ。</p>
+                <p>次の回へ行くんやなぁ。</p>
             {% elif strikes == 0 %}
                 <p>アウト。</p>
+            {% elif nebari == 1 and strikes == 2 %}
+                <p>粘り発動チャンス　もしくは粘り発動！！</p>
             {% else %}
-                <p>空振りで泣きました</p>
-            
+                <p>空振り。</p>
             {% endif %}
         {% endif %}
     {% endif %}
