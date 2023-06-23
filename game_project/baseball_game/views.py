@@ -226,7 +226,7 @@ class BaseballGameView(View):
         elif c_ball == 3 and p_ball == 5:
             for runner in runners[:]:
                 if runner == 3:
-                    if outs <= 10:
+                    if outs <= 1:
                         outs += 1
                         point += 1
                         remove_runner_on_third()
@@ -261,7 +261,7 @@ class BaseballGameView(View):
             reset_game()
             return render(request, self.template_name, {'game_status': 'clear', 'point': point})
 
-        if outs == 10 or outs == 11:
+        if outs == 3 or outs == 4:
             print("3アウト!この回の攻撃は終了です\n\n\n")
             strikes = 0
             runners = []
